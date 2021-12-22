@@ -5,7 +5,10 @@ python:
 services:
   - docker
 
+before_install:
+  - echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin
+
 before_script: pip install docker-compose
 
 script:
-  - docker-compose run server sh -c "python manage.py && flake8"
+  - docker-compose run --rm server sh -c "python manage.py test && flake8"
