@@ -1,1 +1,0 @@
-# MyExtGenApp shared/app
