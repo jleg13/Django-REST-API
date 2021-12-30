@@ -50,8 +50,9 @@ class Tag(models.Model):
         return self.name
 
 
-class GalleryItemBlurb(models.Model):
-    """Blurb for a gallery item"""
+class GalleryItem(models.Model):
+    """Description for a gallery item"""
+    name = models.CharField(max_length=255)
     blurb = models.CharField(max_length=255)
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -59,4 +60,4 @@ class GalleryItemBlurb(models.Model):
     )
 
     def __str__(self):
-        return self.blurb
+        return self.name

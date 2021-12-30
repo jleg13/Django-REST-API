@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from core.models import Tag, GalleryItemBlurb
+from core.models import Tag, GalleryItem
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -12,10 +12,10 @@ class TagSerializer(serializers.ModelSerializer):
         read_only_fields = ('id',)
 
 
-class GalleryItemBlurbSerializer(serializers.ModelSerializer):
+class GalleryItemSerializer(serializers.ModelSerializer):
     """Serializer for gallery item blurb object"""
 
     class Meta:
-        model = GalleryItemBlurb
-        fields = ('id', 'blurb')
+        model = GalleryItem
+        fields = ('id', 'name', 'blurb')
         read_only_fields = ('id',)
