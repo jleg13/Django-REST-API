@@ -49,3 +49,12 @@ class ModelTests(TestCase):
         )
 
         self.assertEqual(str(tag), tag.name)
+
+    def test_gallery_item_blurb_str(self):
+        """Test the gallery item blurb string representation"""
+        gallery_item_blurb = models.GalleryItemBlurb.objects.create(
+            user=sample_user(),
+            blurb='This is a blurb'
+        )
+
+        self.assertEqual(str(gallery_item_blurb), gallery_item_blurb.blurb)
