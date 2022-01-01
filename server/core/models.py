@@ -61,3 +61,18 @@ class GalleryItem(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Gallery(models.Model):
+    """Gallery for a user"""
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
+    )
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    gallery_items = models.ManyToManyField(GalleryItem)
+    tags = models.ManyToManyField(Tag)
+
+    def __str__(self):
+        return self.title

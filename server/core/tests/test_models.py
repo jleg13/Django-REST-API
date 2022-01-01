@@ -59,3 +59,13 @@ class ModelTests(TestCase):
         )
 
         self.assertEqual(str(gallery_item), gallery_item.name)
+
+    def test_gallery_str(self):
+        """Test the gallery string representation"""
+        gallery = models.Gallery.objects.create(
+            user=sample_user(),
+            title='Test gallery',
+            description='This is a description'
+        )
+
+        self.assertEqual(str(gallery), gallery.title)
