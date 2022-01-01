@@ -208,3 +208,49 @@ class PrivateGalleryApiTests(TestCase):
         self.assertEqual(gallery.description, payload['description'])
         tags = gallery.tags.all()
         self.assertEqual(len(tags), 0)
+
+    def test_filter_galleries_by_tags(self):
+        """Test returning galleries with specific tags"""
+        gallery1 = sample_gallery(user=self.user, title='Gallery 1')
+        gallery2 = sample_gallery(user=self.user, title='Gallery 2')
+        tag1 = sample_tag(user=self.user, name='Tag 1')
+        tag2 = sample_tag(user=self.user, name='Tag 2')
+        gallery1.tags.add(tag1)
+        gallery2.tags.add(tag2)
+        gallery3 = sample_gallery(user=self.user, title='Gallery 3')
+
+        res = self.client.get(
+            GALLERY_URL,
+            {'tags': f'{tag1.id},{tag2.id}'}
+        )
+
+        serializer1 = GallerySerializer(gallery1)
+        serializer2 = GallerySerializer(gallery2)
+        serializer3 = GallerySerializer(gallery3)
+        self.assertIn(serializer1.data, res.data)
+        self.assertIn(serializer2.data, res.data)
+        self.assertNotIn(serializer3.data, res.data)
+
+    def test_filter_galleries_by_gallery_items(self):
+        """Test returning galleries with specific gallery items"""
+        gallery1 = sample_gallery(user=self.user, title='Gallery 1')
+        gallery2 = sample_gallery(user=self.user, title='Gallery 2')
+        gallery_item1 = sample_gallery_item(user=self.user,
+                                            name='Gallery item 1')
+        gallery_item2 = sample_gallery_item(user=self.user,
+                                            name='Gallery item 2')
+        gallery1.gallery_items.add(gallery_item1)
+        gallery2.gallery_items.add(gallery_item2)
+        gallery3 = sample_gallery(user=self.user, title='Gallery 3')
+
+        res = self.client.get(
+            GALLERY_URL,
+            {'gallery_items': f'{gallery_item1.id},{gallery_item2.id}'}
+        )
+
+        serializer1 = GallerySerializer(gallery1)
+        serializer2 = GallerySerializer(gallery2)
+        serializer3 = GallerySerializer(gallery3)
+        self.assertIn(serializer1.data, res.data)
+        self.assertIn(serializer2.data, res.data)
+        self.assertNotIn(serializer3.data, res.data)

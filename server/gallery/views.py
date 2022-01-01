@@ -74,9 +74,23 @@ class GalleryViewSet(viewsets.ModelViewSet):
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
 
+    def _params_to_ints(self, qs):
+        """Convert a list of string IDs to a list of integers"""
+        return [int(str_id) for str_id in qs.split(',')]
+
     def get_queryset(self):
         """Return objects for the current authenticated user only"""
-        return self.queryset.filter(user=self.request.user)
+        tags = self.request.query_params.get('tags')
+        gallery_items = self.request.query_params.get('gallery_items')
+        queryset = self.queryset.filter(user=self.request.user)
+        if tags:
+            tags_ids = self._params_to_ints(tags)
+            queryset = queryset.filter(tags__id__in=tags_ids)
+        if gallery_items:
+            gallery_items_ids = self._params_to_ints(gallery_items)
+            queryset = queryset.filter(gallery_items__id__in=gallery_items_ids)
+
+        return queryset.filter(user=self.request.user)
 
     def perform_create(self, serializer):
         """Create a new object"""
