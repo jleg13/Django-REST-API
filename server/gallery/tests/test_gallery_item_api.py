@@ -10,7 +10,7 @@ from django.test import TestCase
 from rest_framework.test import APIClient
 from rest_framework import status
 
-from core.models import GalleryItem
+from core.models import GalleryItem, Gallery
 
 from gallery.serializers import GalleryItemSerializer
 
@@ -135,3 +135,59 @@ class Gallery_Item_Image_Upload_Tests(TestCase):
         res = self.client.post(url, {'image': 'notimage'}, format='multipart')
 
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_retrieve_gallery_items_assigned_to_galleries(self):
+        """Test filtering gallery items by those assigned to Galleries"""
+        gallery_item1 = GalleryItem.objects.create(
+            user=self.user,
+            name='Item 1',
+            blurb='Blurb 1'
+        )
+        gallery_item2 = GalleryItem.objects.create(
+            user=self.user,
+            name='Item 2',
+            blurb='Blurb 2'
+        )
+        gallery = Gallery.objects.create(
+            title='Gallery 1',
+            description='Gallery 1 description',
+            user=self.user
+        )
+        gallery.gallery_items.add(gallery_item1)
+
+        res = self.client.get(GALLERY_ITEM_URL, {'assigned_only': 1})
+
+        serializer1 = GalleryItemSerializer(gallery_item1)
+        serializer2 = GalleryItemSerializer(gallery_item2)
+        self.assertIn(serializer1.data, res.data)
+        self.assertNotIn(serializer2.data, res.data)
+
+    def test_retrieve_gallery_items_assigned_unique(self):
+        """Test filtering gallery items by assigned returns unique items"""
+        gallery_item = GalleryItem.objects.create(
+            user=self.user,
+            name='Item 1',
+            blurb='Blurb 1'
+        )
+        GalleryItem.objects.create(
+            user=self.user,
+            name='Item 2',
+            blurb='Blurb 2'
+        )
+
+        gallery1 = Gallery.objects.create(
+            title='Gallery 1',
+            description='Gallery 1 description',
+            user=self.user
+        )
+        gallery2 = Gallery.objects.create(
+            title='Gallery 2',
+            description='Gallery 2 description',
+            user=self.user
+        )
+        gallery1.gallery_items.add(gallery_item)
+        gallery2.gallery_items.add(gallery_item)
+
+        res = self.client.get(GALLERY_ITEM_URL, {'assigned_only': 1})
+
+        self.assertEqual(len(res.data), 1)
