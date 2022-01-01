@@ -2,7 +2,7 @@ from rest_framework import viewsets, mixins
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 
-from core.models import Tag, GalleryItem
+from core.models import Tag, GalleryItem, Gallery
 
 from gallery import serializers
 
@@ -33,3 +33,26 @@ class GalleryItemViewSet(BaseGalleryAttr):
     """Manage gallery item in the database"""
     queryset = GalleryItem.objects.all()
     serializer_class = serializers.GalleryItemSerializer
+
+
+class GalleryViewSet(viewsets.ModelViewSet):
+    """Manage gallery in the database"""
+    serializer_class = serializers.GallerySerializer
+    queryset = Gallery.objects.all()
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        """Return objects for the current authenticated user only"""
+        return self.queryset.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        """Create a new object"""
+        serializer.save(user=self.request.user)
+
+    def get_serializer_class(self):
+        """Return appropriate serializer class"""
+        if self.action == 'retrieve':
+            return serializers.GalleryDetailSerializer
+
+        return self.serializer_class

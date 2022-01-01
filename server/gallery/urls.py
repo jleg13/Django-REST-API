@@ -7,6 +7,7 @@ from gallery import views
 router = DefaultRouter()
 router.register('tags', views.TagViewSet)
 router.register('gallery-items', views.GalleryItemViewSet)
+router.register('galleries', views.GalleryViewSet)
 
 app_name = 'gallery'
 
