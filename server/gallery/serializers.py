@@ -42,3 +42,12 @@ class GalleryDetailSerializer(GallerySerializer):
     """Serializer for gallery object with detail"""
     gallery_items = GalleryItemSerializer(many=True, read_only=True)
     tags = TagSerializer(many=True, read_only=True)
+
+
+class GalleryItemImageSerializer(serializers.ModelSerializer):
+    """Serializer for gallery item image object"""
+
+    class Meta:
+        model = GalleryItem
+        fields = ('id', 'image')
+        read_only_fields = ('id',)
