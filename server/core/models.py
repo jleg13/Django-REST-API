@@ -1,8 +1,19 @@
+import uuid
+import os
+
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin
 from django.contrib.auth.models import BaseUserManager
 from django.conf import settings
+
+
+def gallery_item_image_file_path(instance, filename):
+    """Generate file path for new gallery item image"""
+    ext = filename.split('.')[-1]
+    filename = f'{uuid.uuid4()}.{ext}'
+
+    return os.path.join('uploads/gallery-items/', filename)
 
 
 class UserManager(BaseUserManager):
@@ -58,6 +69,8 @@ class GalleryItem(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE
     )
+    image = models.ImageField(null=True,
+                              upload_to=gallery_item_image_file_path)
 
     def __str__(self):
         return self.name
