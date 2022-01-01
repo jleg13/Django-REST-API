@@ -29,7 +29,7 @@ class GallerySerializer(serializers.ModelSerializer):
     )
     tags = serializers.PrimaryKeyRelatedField(
         many=True,
-        queryset=GalleryItem.objects.all()
+        queryset=Tag.objects.all()
     )
 
     class Meta:

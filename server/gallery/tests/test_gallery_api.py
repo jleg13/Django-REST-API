@@ -17,9 +17,15 @@ def detail_url(gallery_id):
     return reverse('gallery:gallery-detail', args=[gallery_id])
 
 
-def sample_tag(user, name='Pets'):
+def sample_tag(user, **params):
     """Create and return a sample tag"""
-    return Tag.objects.create(user=user, name=name)
+    defaults = {
+        'name': 'Test tag',
+        'user': user
+    }
+    defaults.update(params)
+
+    return Tag.objects.create(**defaults)
 
 
 def sample_gallery_item(user, **params):
@@ -113,3 +119,92 @@ class PrivateGalleryApiTests(TestCase):
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data, serializer.data)
+
+    def test_create_basic_gallery_(self):
+        """Test creating a new gallery"""
+        payload = {
+            'title': 'Test gallery',
+            'description': 'Test description'
+        }
+        res = self.client.post(GALLERY_URL, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+
+        gallery = Gallery.objects.get(id=res.data['id'])
+        for key in payload.keys():
+            self.assertEqual(payload[key], getattr(gallery, key))
+
+    def test_create_gallery_with_tags(self):
+        """Test creating a gallery with tags"""
+        tag1 = sample_tag(user=self.user)
+        tag2 = sample_tag(user=self.user)
+        payload = {
+            'title': 'Test gallery',
+            'description': 'Test description',
+            'tags': [tag1.id, tag2.id]
+        }
+        res = self.client.post(GALLERY_URL, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+
+        gallery = Gallery.objects.get(id=res.data['id'])
+        tags = gallery.tags.all()
+        self.assertEqual(tags.count(), 2)
+        self.assertIn(tag1, tags)
+        self.assertIn(tag2, tags)
+
+    def test_create_gallery_with_gallery_items(self):
+        """Test creating a gallery with gallery items"""
+        gallery_item1 = sample_gallery_item(user=self.user)
+        gallery_item2 = sample_gallery_item(user=self.user)
+        payload = {
+            'title': 'Test gallery',
+            'description': 'Test description',
+            'gallery_items': [gallery_item1.id, gallery_item2.id]
+        }
+        res = self.client.post(GALLERY_URL, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+
+        gallery = Gallery.objects.get(id=res.data['id'])
+        gallery_items = gallery.gallery_items.all()
+        self.assertEqual(gallery_items.count(), 2)
+        self.assertIn(gallery_item1, gallery_items)
+        self.assertIn(gallery_item2, gallery_items)
+
+    def test_partial_update_gallery(self):
+        """Test updating a gallery with patch"""
+        gallery = sample_gallery(user=self.user)
+        gallery.tags.add(sample_tag(user=self.user))
+        new_tag = sample_tag(user=self.user, name='Test tag 2')
+        payload = {
+            'title': 'New title',
+            'description': 'New description',
+            'tags': [new_tag.id]
+        }
+        url = detail_url(gallery.id)
+        self.client.patch(url, payload)
+
+        gallery.refresh_from_db()
+        self.assertEqual(gallery.title, payload['title'])
+        self.assertEqual(gallery.description, payload['description'])
+        tags = gallery.tags.all()
+        self.assertEqual(len(tags), 1)
+        self.assertIn(new_tag, tags)
+
+    def test_full_update_gallery(self):
+        """Test updating a gallery with put"""
+        gallery = sample_gallery(user=self.user)
+        gallery.tags.add(sample_tag(user=self.user))
+        payload = {
+            'title': 'New title',
+            'description': 'New description',
+        }
+        url = detail_url(gallery.id)
+        self.client.put(url, payload)
+
+        gallery.refresh_from_db()
+        self.assertEqual(gallery.title, payload['title'])
+        self.assertEqual(gallery.description, payload['description'])
+        tags = gallery.tags.all()
+        self.assertEqual(len(tags), 0)
