@@ -11,8 +11,8 @@ A project undertaken on a course learning *Django*. The course utilised a Test D
 
 ## To Run:
 
-- Clone repository and from the root directory run:
+Clone repository and from the root directory run:
 
     docker-compose up
 
-- Application will be available on **localhost:8000**
+Application will be available on **localhost:8000**
