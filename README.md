@@ -1,10 +1,10 @@
-# Exploring Django.
+# Exploring Django
 
-## Project Description
+## Project Description:
 
-A project undertaken on a course learning *Django*. The course utilised a Test Driven Development approach to develop fault tolerent code. The app was a  messaging and  image sharing application.
+A project undertaken on a course learning *Django*. The course utilised a Test Driven Development approach to develop fault tolerent code. The app was a  messaging and image sharing application.
 
-## Built With
+## Built With:
 
 ![Django](https://img.shields.io/badge/Django-092E20?style=for-the-badge&logo=django&logoColor=white)
 ![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
